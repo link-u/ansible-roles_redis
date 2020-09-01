@@ -1,11 +1,8 @@
 ---
-# defaults file for redis
+# defaults/main.yml (redis)
+# Prefix : (redis)
 
-redis_server:
-  bind: 127.0.0.1
-  timeout: 30
-  tcp_keepalive: 60
-  maxclients: 65536
-  maxmemory: 1gb
+### インストール設定 ###############################################################################
+## 基本設定
+redis_install_flag: True # インストールフラグ
 
-install_php_redis: false

@@ -1,0 +1,10 @@
+---
+# tasks/configure.yml (redis)
+# Prefix : (redis)
+
+- name: Restart redis only when installed it
+  systemd:
+    name: redis-server.service
+    state: restarted
+    enabled: yes
+  when: __redis_installed.changed | bool

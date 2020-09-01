@@ -1,9 +1,10 @@
 ---
-# handlers file for redis
+# handler/main.yml (redis)
+# Prefix : (redis)
 
-- name: Restart redis-server
-  service:
-    name: redis-server
+- name: Restart redis
+  systemd:
+    name: redis-server.service
     state: restarted
     enabled: yes
   become: yes

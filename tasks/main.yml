@@ -1,53 +1,13 @@
 ---
-# tasks file for redis
+# tasks/main.yml (redis)
+# Prefix : (redis)
 
-- name: Install redis
-  apt:
-    name: redis-server
-    update_cache: yes
-    cache_valid_time: 86400
-    state: latest
-  tags: redis
+- name: Install tasks
+  import_tasks: install.yml
+  when:
+    - redis_install_flag | bool
+  tags: ["install"]
 
-- name: Start redis
-  service:
-    name: redis-server
-    state: started
-    enabled: yes
-
-- name: Set config parameter
-  lineinfile:
-    dest: /etc/redis/redis.conf
-    state: present
-    regexp: '{{ item.regexp }}'
-    line: '{{ item.line }}'
-  with_items:
-    - regexp: '^bind [0-9.]+$'
-      line: 'bind {{ redis_server.bind }}'
-    - regexp: '^timeout [0-9]+$'
-      line: 'timeout {{ redis_server.timeout }}'
-    - regexp: '^tcp-keepalive [0-9]+$'
-      line: 'tcp-keepalive {{ redis_server.tcp_keepalive }}'
-  notify: Restart redis-server
-
-- name: Append config parameter
-  lineinfile:
-    dest: /etc/redis/redis.conf
-    state: present
-    insertafter: '{{ item.insertafter }}'
-    line: '{{ item.line }}'
-  with_items:
-    - insertafter: '^# maxclients [0-9]+$'
-      line: 'maxclients {{ redis_server.maxclients }}'
-    - insertafter: '^# maxmemory <bytes>$'
-      line: 'maxmemory {{ redis_server.maxmemory }}'
-  notify: Restart redis-server
-
-- name: Install php-redis
-  apt:
-    name: php-redis
-    update_cache: yes
-    cache_valid_time: 86400
-    state: latest
-  when: install_php_redis
-  notify: Restart php7.0-fpm
+- name: Configure tasks
+  import_tasks: configure.yml
+  tags: ["configure"]
