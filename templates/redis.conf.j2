@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+
+{% for item in (__redis_combined_conf | dictsort(by='key')) %}{% set key = item[0] %}{% set value = item[1] %}
+{%   if value is iterable and value is not string %}
+{%     for inValue in value %}
+{{       key }} {{ inValue }}
+{%     endfor %}
+{%   else %}
+{{     key }} {{ value }}
+{%   endif %}
+{% endfor %}
