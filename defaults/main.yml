@@ -9,6 +9,11 @@ redis_conf_path: "/etc/redis/redis.conf"
 
 
 ### conf ファイル設定 ##############################################################################
+## INCLUDES
+redis_conf_include: null     # null を指定すると conf ファイルには記入されない
+## MODULES
+redis_conf_loadmodule: null  # null を指定すると conf ファイルには記入されない
+
 ## conf ファイルのデフォルト値
 #  * インストールした直後の値を参考に選んでいる.
 __redis_defaults_conf:

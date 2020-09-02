@@ -1,5 +1,12 @@
 # {{ ansible_managed }}
 
+{% if redis_conf_include != None %}
+include {{ redis_conf_include }}
+{% endif %}
+{% if redis_conf_loadmodule != None %}
+loadmodule {{ redis_conf_loadmodule }}
+{% endif %}
+
 {% for item in (__redis_combined_conf | dictsort(by='key')) %}{% set key = item[0] %}{% set value = item[1] %}
 {%   if value is iterable and value is not string %}
 {%     for inValue in value %}
