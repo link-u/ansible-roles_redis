@@ -1,0 +1,19 @@
+---
+# tasks/configure.yml (redis)
+# Prefix : (redis)
+
+- name: Create redis.conf
+  template:
+    src: "redis.conf.j2"
+    dest: "{{ redis_conf_path }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: "Restart redis"
+
+- name: Restart redis only when installed it
+  systemd:
+    name: redis-server.service
+    state: restarted
+    enabled: yes
+  when: __redis_installed.changed | bool
