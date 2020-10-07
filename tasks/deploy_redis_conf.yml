@@ -1,0 +1,25 @@
+---
+# tasks/deploy_redis_conf.yml (redis)
+# Prefix : (redis)
+
+- name: "Create {{__redis_deply_conf_file_name}}"
+  template:
+    src: "redis.conf.j2"
+    dest: "/etc/redis/{{ __redis_deply_conf_file_name }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  vars:
+    __redis_deply_conf_file_name: "redis{{ (redis_enable_multi_instance | bool) | ternary('-' ~ instance, '') }}.conf"
+  register: __redis_deploy_conf_file
+
+- name: "Restart redis-server for {{ instance }} when changed conf file"
+  systemd:
+    name: >-
+      redis-server{{ (redis_enable_multi_instance | bool) | ternary('@' ~ instance, '') }}.service
+    state: restarted
+    enabled: yes
+  become: yes
+  vars:
+    __redis_service: redis-server{{ (redis_enable_multi_instance | bool) | ternary('@' ~ instance, '') }}.service
+  when: __redis_deploy_conf_file.changed | bool

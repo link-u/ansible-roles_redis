@@ -3,17 +3,18 @@
 # Prefix : (redis)
 
 - name: Create redis.conf
-  template:
-    src: "redis.conf.j2"
-    dest: "{{ redis_conf_path }}"
-    owner: "root"
-    group: "root"
-    mode: "0644"
-  notify: "Restart redis"
-
-- name: Restart redis only when installed it
-  systemd:
-    name: redis-server.service
-    state: restarted
-    enabled: yes
-  when: __redis_installed.changed | bool
+  include_tasks: "deploy_redis_conf.yml"
+  loop: "{{ __redis_instances }}"
+  loop_control:
+    loop_var: instance
+  vars:
+    __redis_instances: |
+      {% if redis_enable_multi_instance %}
+      {%   set __tmp_list = [] %}
+      {%   for _instance, _conf in __redis_combined_conf.items() %}
+      {%     set _ = __tmp_list.append(_instance) %}
+      {%   endfor %}
+      {{   __tmp_list }}
+      {% else %}
+      {{ ['default'] }}
+      {% endif %}
