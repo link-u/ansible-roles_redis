@@ -2,7 +2,7 @@
 # tasks/deploy_redis_conf.yml (redis)
 # Prefix : (redis)
 
-- name: "Create {{__redis_deply_conf_file_name}}"
+- name: "Create {{ __redis_deply_conf_file_name }}"
   template:
     src: "redis.conf.j2"
     dest: "/etc/redis/{{ __redis_deply_conf_file_name }}"
