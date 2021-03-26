@@ -6,8 +6,8 @@
   template:
     src: "redis.conf.j2"
     dest: "/etc/redis/{{ __redis_deply_conf_file_name }}"
-    owner: "redis"
-    group: "redis"
+    owner: "root"
+    group: "root"
     mode: "0644"
   vars:
     __redis_deply_conf_file_name: "redis{{ (redis_enable_multi_instance | bool) | ternary('-' ~ instance, '') }}.conf"
