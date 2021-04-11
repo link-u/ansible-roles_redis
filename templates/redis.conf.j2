@@ -1,4 +1,5 @@
 # {{ ansible_managed }}
+# {{ instance }} conf file
 
 {% if redis_conf_include != None %}
 include {{ redis_conf_include }}
@@ -7,7 +8,25 @@ include {{ redis_conf_include }}
 loadmodule {{ redis_conf_loadmodule }}
 {% endif %}
 
-{% for item in (__redis_combined_conf | dictsort(by='key')) %}{% set key = item[0] %}{% set value = item[1] %}
+{# instance の設定を変数に取り出す #}
+{% set __redis_conf_instance = __redis_combined_conf[instance] %}
+{% if redis_enable_multi_instance | bool %}
+{#   dbfilename が未定義の時のデフォルト値 #}
+{%   set _tmp_obj = { 'dbfilename' : (redis_conf[instance]['dbfilename'] | default('dump-' ~ instance ~ '.rdb')) } %}
+{%   set _ = __redis_conf_instance.update( _tmp_obj ) %}
+{#   logfile が未定義の時のデフォルト値 #}
+{%   set _tmp_obj = { 'logfile' : (redis_conf[instance]['logfile'] | default('/var/log/redis/redis-server-' ~ instance ~ '.log')) } %}
+{%   set _ = __redis_conf_instance.update( _tmp_obj ) %}
+{#   pidfile が未定義の時のデフォルト値 #}
+{%   set _tmp_obj = { 'pidfile' : (redis_conf[instance]['pidfile'] | default('/var/run/redis-' ~ instance ~ '/redis-server.pid')) } %}
+{%   set _ = __redis_conf_instance.update( _tmp_obj ) %}
+{#   unixsocket が未定義の時のデフォルト値 #}
+{%   set _tmp_obj = { 'unixsocket' : (redis_conf[instance]['unixsocket'] | default('/var/run/redis-' ~ instance ~ '/redis-server.sock')) } %}
+{%   set _ = __redis_conf_instance.update( _tmp_obj ) %}
+{% endif %}
+{##}
+{# conf ファイルに出力 #}
+{% for item in (__redis_conf_instance | dictsort(by='key')) %}{% set key = item[0] %}{% set value = item[1] %}
 {%   if value != None %}
 {%     if value is iterable and value is not string %}
 {%       for inValue in value %}

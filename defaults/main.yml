@@ -6,6 +6,7 @@
 ## 基本設定
 redis_install_flag: True # インストールフラグ
 redis_conf_path: "/etc/redis/redis.conf"
+redis_enable_multi_instance: no
 
 
 ### conf ファイル設定 ##############################################################################
@@ -84,4 +85,15 @@ __redis_defaults_conf:
   rdb-save-incremental-fsync: "yes"
 
 redis_conf: {}
-__redis_combined_conf: "{{ __redis_defaults_conf | combine(redis_conf, recursive=True) }}"
+#__redis_combined_conf: "{{ __redis_defaults_conf | combine(redis_conf, recursive=True) }}"
+__redis_combined_conf: |
+  {% if redis_enable_multi_instance %}
+  {%   set __tmp_redis_combined_conf = {} %}
+  {%   for _instance, _conf in redis_conf.items() %}
+  {%     set _instance_redis_conf = (__redis_defaults_conf | combine(_conf, recursive=True)) %}
+  {%     set _ = __tmp_redis_combined_conf.update( {_instance: _instance_redis_conf} ) %}
+  {%   endfor %}
+  {{   __tmp_redis_combined_conf }}
+  {% else %}
+  {{   { 'default' : (__redis_defaults_conf | combine(redis_conf, recursive=True)) } }}
+  {% endif %}

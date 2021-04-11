@@ -8,3 +8,10 @@
     update_cache: yes
     state: "present"
   register: __redis_installed
+
+- name: Stop redis only when installed it
+  systemd:
+    name: redis-server.service
+    state: stopped
+    enabled: no
+  when: __redis_installed.changed | bool
